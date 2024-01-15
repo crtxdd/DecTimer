@@ -17,4 +17,4 @@ RUN go build -o /godocker
 EXPOSE 8080
  
 # Specifies the executable command that runs when the container starts
-CMD [ “/godocker” ]
+ENTRYPOINT ["/godocker"]
