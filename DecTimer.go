@@ -30,7 +30,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	// If Author is Declan
+	// If Author is Declan or me
 	if m.Author.ID == strconv.Itoa(DecID) || m.Author.ID == strconv.Itoa(CalID) {
 		if strings.Contains(m.Content, "!set") {
 			// Parse out day, month, year   Strict 01/01/24 format required
@@ -87,9 +87,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			dayString = "day"
 		}
 
-		s.ChannelMessageSend(m.ChannelID, "Dec returns in "+hr+" Hours, or "+dr+" "+dayString)
+		s.ChannelMessageSend(m.ChannelID, "Dec returns in "+hr+" Hours, or "+dr+" "+dayString+" 🚢")
 
 	}
+
+	// if strings.Contains(m.Content, "@Lethal Company") {
+	// 	s.ChannelMessageSend(m.ChannelID,)
+	// }
 
 }
 
