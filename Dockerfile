@@ -7,6 +7,8 @@ WORKDIR /app
 # Copies everything from your root directory into /app
 COPY . .
  
+ENV TOKEN ""
+
 # Installs Go dependencies
 RUN go mod download
  
