@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/signal"
@@ -21,6 +22,11 @@ var (
 	hours, mins, secs                       float64
 	then                                    time.Time
 )
+
+func init() {
+	flag.StringVar(&Token, "t", "", "Bot Token")
+	flag.Parse()
+}
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
@@ -98,8 +104,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func main() {
-
-	Token = "MTE5NjUyNDg5NDUxNTY0MjQ3OA.GmsvEd.IsH7FKO8UtXn4Ih3tSObbINKeGMlsm6LuWJXrw"
 
 	ds, err := discordgo.New("Bot " + Token)
 
