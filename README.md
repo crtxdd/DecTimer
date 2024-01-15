@@ -1,12 +1,8 @@
 # DecTimer
-Discord bot for tracking when Declan is back off ship. Written in Go
+A silly Discord bot for tracking when Declan is back off ship. Written in Go.
 
-# Features
-
-- Live tracking
-- @DecoB
-- Phonepic
-- @lethalcompany spam
+# Features to add
+- Live tracking ship via https://aisstream.io/
 
 docker build --rm -t dectimer:alpha .
 
