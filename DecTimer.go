@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/signal"
@@ -8,6 +9,7 @@ import (
 	"strings"
 	"syscall"
 	"time"
+	"unicode"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -22,15 +24,22 @@ var (
 	then                                    time.Time
 )
 
-// func init() {
-// 	flag.StringVar(&Token, "t", "", "Bot Token")
-// 	flag.Parse()
+func init() {
+	flag.StringVar(&Token, "t", "", "Bot Token")
+	flag.Parse()
+}
+
+// func setDate () {
+
 // }
 
+// func getTime(content string) {
+
+// }
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
-	// Ignore all messages created by the bot itself
 	Now = time.Now()
+	// Ignore all messages created by the bot itself
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
@@ -38,10 +47,32 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// If Author is Declan or me
 	if m.Author.ID == strconv.Itoa(DecID) || m.Author.ID == strconv.Itoa(CalID) {
 		if strings.Contains(m.Content, "!set") {
+
 			// Parse out day, month, year   Strict 01/01/24 format required
-
 			thenString = m.Content[5:]
+			// If length isn't 8, format incorrect
+			if len(thenString) != 8 {
+				fmt.Println("Invaid date format! DD/MM/YY")
+				s.ChannelMessageSend(m.ChannelID, "Date does not follow DD/MM/YY")
+				return
+			}
+			//Init rune arrays
+			runeArray := []rune(thenString)
+			failArray := []rune{}
 
+			for i := 0; i < 7; i++ {
+				if unicode.IsLetter(runeArray[i]) {
+					failArray = append(failArray, runeArray[i])
+				}
+			}
+
+			//If fail array contains letters, error.
+			if len(failArray) > 0 {
+				fmt.Printf("Date %s contains letters %d", thenString, failArray)
+				s.ChannelMessageSend(m.ChannelID, "Date contains letters!")
+				return
+			}
+			//Slice date
 			Day = thenString[0:2]
 			Month = thenString[3:5]
 			Year = "20" + thenString[6:8]
@@ -55,7 +86,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}
 
 			if dd > 31 || dm > 12 {
-				s.ChannelMessageSend(m.ChannelID, "Invalid date")
+				s.ChannelMessageSend(m.ChannelID, "Date is invalid!")
 				return
 			}
 
@@ -63,6 +94,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			// If date is in the past
 			if then.Sub(Now) < 1 {
 				s.ChannelMessageSend(m.ChannelID, "Please pick a date in the future")
+				return
 			}
 		}
 	}
@@ -104,8 +136,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func main() {
 
-	var Token string
-	Token = os.Getenv("TOKEN")
+	// var Token string
+	// Token = os.Getenv("TOKEN")
 
 	ds, err := discordgo.New("Bot " + Token)
 
