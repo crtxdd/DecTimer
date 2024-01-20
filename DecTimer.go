@@ -12,6 +12,8 @@ import (
 	"unicode"
 	"bufio"
 	"log"
+	"bytes"
+	"os/exec"
 	
 	"github.com/bwmarrin/discordgo"
 )
@@ -26,6 +28,7 @@ var (
 	dayString         string
 	hours, mins, secs float64
 	then              time.Time
+	points			  map[string]int
 )
 
 // func init() {
@@ -141,8 +144,18 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 }
 
+func createKeyValuePairs(m map[string]int) string {
+    b := new(bytes.Buffer)
+    for key, value := range m {
+        fmt.Fprintf(b, "%s=\"%d\"\n", key, value)
+    }
+    return b.String()
+}
+
 
 func main() {
+
+	points = make(map[string]int)
 
 	file, err := os.OpenFile("points.txt", os.O_RDWR, 0644)
 
@@ -154,12 +167,23 @@ func main() {
 	scanner := bufio.NewScanner(file)
     // scan or read the bytes of text line by line
     for scanner.Scan() {
-        fmt.Println(scanner.Text())
+        line := scanner.Text()
+		points[line[:3]], err = strconv.Atoi(line[6:6])
     }
+
+	fmt.Println(createKeyValuePairs(points))
+
+	err = exec.Command("/bin/bash", "-c", "echo > points.txt").Run()
+	if err != nil {
+		log.Printf("Failed to truncate: %v", err)
+	}
 
 	textWriter := bufio.NewWriter(file)
 
-	_, err = textWriter.WriteString("-This is a new text added to the file.")
+	// out := strings.Replace(createKeyValuePairs(points), "\x00", "", -1)
+
+	textWriter.Flush()
+	_, err = textWriter.WriteString("test")
 	if err != nil {
 		log.Fatal(err)
 	}
