@@ -1,0 +1,7 @@
+dec,0
+cal,0
+alx,0
+sam,0
+chs,0
+kat,0
+dan,0

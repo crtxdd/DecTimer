@@ -2,7 +2,6 @@ package main
 
 import (
 	// "flag"
-
 	"fmt"
 	"os"
 	"os/signal"
@@ -11,9 +10,13 @@ import (
 	"syscall"
 	"time"
 	"unicode"
-
+	"bufio"
+	"log"
+	
 	"github.com/bwmarrin/discordgo"
 )
+
+	
 
 var (
 	Token             string
@@ -29,6 +32,11 @@ var (
 // 	flag.StringVar(&Token, "t", "", "Bot Token")
 // 	flag.Parse()
 // }
+
+type Player struct {
+	Name string
+	Points int
+}
 
 func setDate(content string, author string, s *discordgo.Session, m *discordgo.MessageCreate) {
 
@@ -133,36 +141,58 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 }
 
+
 func main() {
+
+	file, err := os.OpenFile("points.txt", os.O_RDWR, 0644)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+    // scan or read the bytes of text line by line
+    for scanner.Scan() {
+        fmt.Println(scanner.Text())
+    }
+
+	textWriter := bufio.NewWriter(file)
+
+	_, err = textWriter.WriteString("-This is a new text added to the file.")
+	if err != nil {
+		log.Fatal(err)
+	}
+	textWriter.Flush()
 
 	var Token string
 	Token = os.Getenv("TOKEN")
 
 	ds, err := discordgo.New("Bot " + Token)
-
+	
 	if err != nil {
 		fmt.Println("error creating Discord session,", err)
 		return
 	}
-
+	
 	// Register the messageCreate func as a callback for MessageCreate events.
 	ds.AddHandler(messageCreate)
-
+	
 	// In this example, we only care about receiving message events.
 	ds.Identify.Intents = discordgo.IntentsGuildMessages
-
+	
 	err = ds.Open()
 	if err != nil {
 		fmt.Println("error opening connection,", err)
 		return
 	}
-
+	
 	// Wait here until CTRL-C or other term signal is received.
 	fmt.Println("Bot is now running. Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	<-sc
-
+	
 	// Cleanly close down the Discord session.
 	ds.Close()
 }
