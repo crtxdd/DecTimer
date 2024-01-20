@@ -1,4 +1,4 @@
-# DecTimer
+# DecoBot
 A silly Discord bot for tracking when Declan is back off ship. Written in Go.
 
 # Features to add
